@@ -156,7 +156,7 @@ extension KurrentDBClient {
     /// - Returns: An `Append.Response` indicating the result of the operation.
     /// - Throws: An error if the metadata cannot be set.
     @discardableResult
-    public func setStreamMetadata(on streamIdentifier: StreamIdentifier, metadata: StreamMetadata, expectedRevision: StreamRevision = .any) async throws -> Streams<SpecifiedStream>.Append.Response {
+    public func setStreamMetadata(_ streamIdentifier: StreamIdentifier, metadata: StreamMetadata, expectedRevision: StreamRevision = .any) async throws -> Streams<SpecifiedStream>.Append.Response {
         try await streams(of: .specified(streamIdentifier)).setMetadata(metadata: metadata, expectedRevision: expectedRevision)
     }
 
@@ -165,7 +165,7 @@ extension KurrentDBClient {
     /// - Parameter streamIdentifier: The identifier of the target stream.
     /// - Returns: The `StreamMetadata` if available, otherwise `nil`.
     /// - Throws: An error if the metadata cannot be retrieved.
-    public func getStreamMetadata(on streamIdentifier: StreamIdentifier) async throws -> StreamMetadata? {
+    public func getStreamMetadata(_ streamIdentifier: StreamIdentifier) async throws -> StreamMetadata? {
         return try await streams(of: .specified(streamIdentifier)).getMetadata()
     }
     
@@ -178,7 +178,7 @@ extension KurrentDBClient {
     /// - Returns: An `Append.Response` indicating the result.
     /// - Throws: An error if the append operation fails.
     @discardableResult
-    public func appendStream(on streamIdentifier: StreamIdentifier, events: [EventData], configure: @Sendable (Streams<SpecifiedStream>.Append.Options) -> Streams<SpecifiedStream>.Append.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Append.Response {
+    public func appendStream(_ streamIdentifier: StreamIdentifier, events: [EventData], configure: @Sendable (Streams<SpecifiedStream>.Append.Options) -> Streams<SpecifiedStream>.Append.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Append.Response {
         let options = configure(.init())
         return try await streams(of: .specified(streamIdentifier)).append(events: events, options: options)
     }
@@ -190,7 +190,7 @@ extension KurrentDBClient {
     ///   - configure: A closure to customize the read options, defaulting to no modifications.
     /// - Returns: An asynchronous stream of `ReadAll.Response` values.
     /// - Throws: An error if the read operation fails.
-    public func readAllStreams(startFrom cursor: PositionCursor = .start, configure: @Sendable (Streams<AllStreams>.ReadAll.Options) -> Streams<AllStreams>.ReadAll.Options = { $0 }) async throws -> Streams<AllStreams>.ReadAll.Responses {
+    public func readAllStreams(since cursor: PositionCursor = .start, configure: @Sendable (Streams<AllStreams>.ReadAll.Options) -> Streams<AllStreams>.ReadAll.Options = { $0 }) async throws -> Streams<AllStreams>.ReadAll.Responses {
         let options = configure(.init())
         return try await streams(of: .all).read(startFrom: cursor, options: options)
     }
@@ -203,7 +203,7 @@ extension KurrentDBClient {
     ///   - configure: A closure to customize the read options, defaulting to no modifications.
     /// - Returns: An asynchronous stream of `Read.Response` values.
     /// - Throws: An error if the read operation fails.
-    public func readStream(on streamIdentifier: StreamIdentifier, startFrom cursor: RevisionCursor = .start, configure: @Sendable (Streams<SpecifiedStream>.Read.Options) -> Streams<SpecifiedStream>.Read.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Read.Responses {
+    public func readStream(_ streamIdentifier: StreamIdentifier, since cursor: RevisionCursor = .start, configure: @Sendable (Streams<SpecifiedStream>.Read.Options) -> Streams<SpecifiedStream>.Read.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Read.Responses {
         let options = configure(.init())
         return try await streams(of: .specified(streamIdentifier)).read(startFrom: cursor, options: options)
     }
@@ -215,7 +215,7 @@ extension KurrentDBClient {
     ///   - configure: A closure to customize the subscription options, defaulting to no modifications.
     /// - Returns: A `Subscription` instance for receiving events.
     /// - Throws: An error if the subscription fails.
-    public func subscribeAllStreams(startFrom cursor: PositionCursor = .start, configure: @Sendable (Streams<AllStreams>.SubscribeAll.Options) -> Streams<AllStreams>.SubscribeAll.Options = { $0 }) async throws -> Streams<AllStreams>.Subscription {
+    public func subscribeAllStreams(since cursor: PositionCursor = .start, configure: @Sendable (Streams<AllStreams>.SubscribeAll.Options) -> Streams<AllStreams>.SubscribeAll.Options = { $0 }) async throws -> Streams<AllStreams>.Subscription {
         let options = configure(.init())
         return try await streams(of: .all).subscribe(startFrom: cursor, options: options)
     }
@@ -228,7 +228,7 @@ extension KurrentDBClient {
     ///   - configure: A closure to customize the subscription options, defaulting to no modifications.
     /// - Returns: A `Subscription` instance for receiving events.
     /// - Throws: An error if the subscription fails.
-    public func subscribeStream(on streamIdentifier: StreamIdentifier, startFrom cursor: RevisionCursor = .end, configure: @Sendable (Streams<SpecifiedStream>.Subscribe.Options) -> Streams<SpecifiedStream>.Subscribe.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Subscription {
+    public func subscribeStream(_ streamIdentifier: StreamIdentifier, since cursor: RevisionCursor = .end, configure: @Sendable (Streams<SpecifiedStream>.Subscribe.Options) -> Streams<SpecifiedStream>.Subscribe.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Subscription {
         let options = configure(.init())
         return try await streams(of: .specified(streamIdentifier)).subscribe(startFrom: cursor, options: options)
     }
@@ -241,7 +241,7 @@ extension KurrentDBClient {
     /// - Returns: A `Delete.Response` indicating the result.
     /// - Throws: An error if the delete operation fails.
     @discardableResult
-    public func deleteStream(on streamIdentifier: StreamIdentifier, configure: @Sendable (Streams<SpecifiedStream>.Delete.Options) -> Streams<SpecifiedStream>.Delete.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Delete.Response {
+    public func deleteStream(_ streamIdentifier: StreamIdentifier, configure: @Sendable (Streams<SpecifiedStream>.Delete.Options) -> Streams<SpecifiedStream>.Delete.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Delete.Response {
         let options = configure(.init())
         return try await streams(of: .specified(streamIdentifier)).delete(options: options)
     }
@@ -254,7 +254,7 @@ extension KurrentDBClient {
     /// - Returns: A `Tombstone.Response` indicating the result.
     /// - Throws: An error if the tombstone operation fails.
     @discardableResult
-    public func tombstoneStream(on streamIdentifier: StreamIdentifier, configure: @Sendable (Streams<SpecifiedStream>.Tombstone.Options) -> Streams<SpecifiedStream>.Tombstone.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Tombstone.Response {
+    public func tombstoneStream(_ streamIdentifier: StreamIdentifier, configure: @Sendable (Streams<SpecifiedStream>.Tombstone.Options) -> Streams<SpecifiedStream>.Tombstone.Options = { $0 }) async throws -> Streams<SpecifiedStream>.Tombstone.Response {
         let options = configure(.init())
         return try await streams(of: .specified(streamIdentifier)).tombstone(options: options)
     }
@@ -286,7 +286,7 @@ extension KurrentDBClient {
     ///   - cursor: The starting revision for the subscription, defaulting to `.end`.
     ///   - configure: A closure to customize the creation options, defaulting to no modifications.
     /// - Throws: An error if the creation fails.
-    public func createPersistentSubscription(to streamIdentifier: StreamIdentifier, groupName: String, startFrom cursor: RevisionCursor = .end, configure: @Sendable (PersistentSubscriptions<PersistentSubscription.Specified>.Create.Options) -> PersistentSubscriptions<PersistentSubscription.Specified>.Create.Options = { $0 }) async throws {
+    public func createPersistentSubscription(stream streamIdentifier: StreamIdentifier, groupName: String, since cursor: RevisionCursor = .end, configure: @Sendable (PersistentSubscriptions<PersistentSubscription.Specified>.Create.Options) -> PersistentSubscriptions<PersistentSubscription.Specified>.Create.Options = { $0 }) async throws {
         let options = configure(.init())
         try await streams(of: .specified(streamIdentifier))
             .persistentSubscriptions(group: groupName)
@@ -300,28 +300,28 @@ extension KurrentDBClient {
     ///   - cursor: The starting position for the subscription, defaulting to `.start`.
     ///   - configure: A closure to customize the creation options, defaulting to no modifications.
     /// - Throws: An error if the creation fails.
-    public func createPersistentSubscriptionToAllStream(groupName: String, startFrom cursor: PositionCursor = .start, configure: @Sendable (PersistentSubscriptions<PersistentSubscription.AllStream>.Create.Options) -> PersistentSubscriptions<PersistentSubscription.AllStream>.Create.Options = { $0 }) async throws {
+    public func createPersistentSubscriptionToAllStream(groupName: String, since cursor: PositionCursor = .start, configure: @Sendable (PersistentSubscriptions<PersistentSubscription.AllStream>.Create.Options) -> PersistentSubscriptions<PersistentSubscription.AllStream>.Create.Options = { $0 }) async throws {
         let options = configure(.init())
         try await streams(of: .all)
             .persistentSubscriptions(group: groupName)
             .create(startFrom: cursor, options: options)
     }
     
-    public func updatePersistentSubscription(to streamIdentifier: StreamIdentifier, groupName: String, startFrom cursor: RevisionCursor = .end, configure: @Sendable (PersistentSubscriptions<PersistentSubscription.Specified>.Update.Options) -> PersistentSubscriptions<PersistentSubscription.Specified>.Update.Options = { $0 }) async throws {
+    public func updatePersistentSubscription(stream streamIdentifier: StreamIdentifier, groupName: String, since cursor: RevisionCursor = .end, configure: @Sendable (PersistentSubscriptions<PersistentSubscription.Specified>.Update.Options) -> PersistentSubscriptions<PersistentSubscription.Specified>.Update.Options = { $0 }) async throws {
         let options = configure(.init())
         try await streams(of: .specified(streamIdentifier))
             .persistentSubscriptions(group: groupName)
             .update(startFrom: cursor, options: options)
     }
     
-    public func updatePersistentSubscriptionToAllStream(groupName: String, startFrom cursor: PositionCursor = .start, configure: @Sendable  (PersistentSubscriptions<PersistentSubscription.AllStream>.Update.Options) -> PersistentSubscriptions<PersistentSubscription.AllStream>.Update.Options = { $0 }) async throws {
+    public func updatePersistentSubscriptionToAllStream(groupName: String, since cursor: PositionCursor = .start, configure: @Sendable  (PersistentSubscriptions<PersistentSubscription.AllStream>.Update.Options) -> PersistentSubscriptions<PersistentSubscription.AllStream>.Update.Options = { $0 }) async throws {
         let options = configure(.init())
         try await streams(of: .all)
             .persistentSubscriptions(group: groupName)
             .update(startFrom: cursor, options: options)
     }
     
-    public func subscribePersistentSubscription(to streamIdentifier: StreamIdentifier, groupName: String, configure: @Sendable (PersistentSubscriptions<PersistentSubscription.Specified>.ReadOptions) -> PersistentSubscriptions<PersistentSubscription.Specified>.ReadOptions = { $0 }) async throws -> PersistentSubscriptions<PersistentSubscription.Specified>.Subscription {
+    public func subscribePersistentSubscription(stream streamIdentifier: StreamIdentifier, groupName: String, configure: @Sendable (PersistentSubscriptions<PersistentSubscription.Specified>.ReadOptions) -> PersistentSubscriptions<PersistentSubscription.Specified>.ReadOptions = { $0 }) async throws -> PersistentSubscriptions<PersistentSubscription.Specified>.Subscription {
         let options = configure(.init())
         let stream = streams(of: .specified(streamIdentifier))
         return try await stream.persistentSubscriptions(group: groupName).subscribe(options: options)
@@ -339,7 +339,7 @@ extension KurrentDBClient {
     ///   - streamIdentifier: The identifier of the target stream.
     ///   - groupName: The name of the subscription group.
     /// - Throws: An error if the deletion fails.
-    public func deletePersistentSubscription(to streamIdentifier: StreamIdentifier, groupName: String) async throws {
+    public func deletePersistentSubscription(stream streamIdentifier: StreamIdentifier, groupName: String) async throws {
         try await streams(of: .specified(streamIdentifier))
             .persistentSubscriptions(group: groupName)
             .delete()
@@ -360,7 +360,7 @@ extension KurrentDBClient {
     /// - Parameter streamIdentifier: The identifier of the target stream.
     /// - Returns: An array of `PersistentSubscription.SubscriptionInfo` objects.
     /// - Throws: An error if the list operation fails.
-    public func listPersistentSubscriptions(to streamIdentifier: StreamIdentifier) async throws -> [PersistentSubscription.SubscriptionInfo] {
+    public func listPersistentSubscriptions(stream streamIdentifier: StreamIdentifier) async throws -> [PersistentSubscription.SubscriptionInfo] {
         return try await persistentSubscriptions.list(for: .stream(streamIdentifier))
     }
     
