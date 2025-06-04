@@ -70,6 +70,11 @@ extension Streams.Read {
         }
 
         
+        /// Constructs the underlying protobuf message for a stream read operation using the current options.
+        ///
+        /// The resulting message includes stream revision, read direction, link resolution, UUID format, compatibility, and limit settings.
+        ///
+        /// - Returns: A configured `UnderlyingMessage` representing the read options.
         package func build() -> UnderlyingMessage {
             .with {
                 $0.noFilter = .init()
@@ -141,6 +146,7 @@ extension Streams.Read {
             }
         }
         
+        /// Returns a copy of the options with the read direction set to backward.
         @discardableResult
         public func backward() -> Self {
             withCopy{ options in
@@ -148,6 +154,13 @@ extension Streams.Read {
             }
         }
         
+        /// Returns a copy of the options with the specified stream revision and adjusts the read direction based on the revision value.
+        ///
+        /// If the revision is `.start`, the direction is set to `.forward`. If the revision is `.end`, the direction is set to `.backward`. For a specific revision, the direction remains unchanged.
+        ///
+        /// - Parameter revision: The stream revision to use for reading.
+        ///
+        /// - Returns: A copy of the options with the updated revision and direction.
         @discardableResult
         public func revision(from revision: RevisionCursor) -> Self {
             withCopy{ options in

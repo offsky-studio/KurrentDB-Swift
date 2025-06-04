@@ -80,6 +80,11 @@ extension Streams.ReadAll{
             self.direction = .forward
         }
 
+        /// Constructs the underlying gRPC request message for reading all streams using the configured options.
+        ///
+        /// The returned message includes settings for filtering, UUID format, compatibility, link resolution, read limit, stream position, and read direction.
+        ///
+        /// - Returns: A configured gRPC request message reflecting the current options.
         package func build() -> UnderlyingMessage {
             .with {
                 $0.noFilter = .init()
@@ -152,6 +157,9 @@ extension Streams.ReadAll{
             }
         }
         
+        /// Returns a copy of the options configured to read events in backward direction.
+        ///
+        /// - Returns: A modified copy of the options with the direction set to backward.
         @discardableResult
         public func backward() -> Self {
             withCopy{ options in
@@ -159,6 +167,10 @@ extension Streams.ReadAll{
             }
         }
         
+        /// Returns a copy of the options with the read position set to the specified cursor.
+        ///
+        /// - Parameter cursor: The stream position to use as the starting point for reading.
+        /// - Returns: A new `Options` instance with the updated position.
         @discardableResult
         public func position(from cursor: PositionCursor) -> Self {
             withCopy{ options in
